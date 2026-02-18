@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Sholat & Ramadhan | Akurat Kemenag</title>
+    <title>Jadwal Sholat & Ramadhan | Akurat Kemenag (+3 ihtiyat)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -88,15 +88,18 @@
         </div>
 
         <div class="grid gap-2" id="prayerList">
-            </div>
+            <!-- akan diisi javascript -->
+        </div>
 
         <p class="text-[10px] text-center text-slate-500 uppercase tracking-[0.2em] pt-2">
-            Metode Kemenag RI (Ihtiyat +3m) • © 2026
+            Metode Kemenag RI • Semua waktu +3 menit (ihtiyat) • © 2026
         </p>
     </div>
 
     <script>
-        const CONFIG = { tune: "0,0,0,0,0,3,3,3,0", method: 11 };
+        // Tuning: tambah 3 menit untuk Imsak, Fajr, Dhuhr, Asr, Maghrib, Sunset, Isha
+        // Urutan: Imsak, Fajr, Sunrise, Dhuhr, Asr, Maghrib, Sunset, Isha, Midnight
+        const CONFIG = { tune: "3,3,0,3,3,3,3,3,0", method: 11 };
         let state = { city: 'Kediri', data: null };
 
         async function fetchPrayer(city) {
@@ -118,7 +121,7 @@
             document.getElementById('cityNameDisplay').innerText = state.city;
             document.getElementById('hijriDisplay').innerText = `${d.date.hijri.day} ${d.date.hijri.month.en} ${d.date.hijri.year} H`;
             
-            // Tambahan: Update Gregorian Date
+            // Gregorian Date
             document.getElementById('gregorianDisplay').innerText = `${d.date.gregorian.weekday.en}, ${d.date.gregorian.day} ${d.date.gregorian.month.en} ${d.date.gregorian.year}`;
             
             // Imsak & Iftar (Maghrib)
@@ -142,7 +145,7 @@
                 const timeStr = t[p.id];
                 const [h, m] = timeStr.split(':').map(Number);
                 const pMins = h * 60 + m;
-                const isNow = (currentMins >= pMins && currentMins < pMins + 20);
+                const isNow = (currentMins >= pMins && currentMins < pMins + 20); // anggap waktu sholat 20 menit
 
                 if (!next && pMins > currentMins) next = { ...p, time: timeStr, mins: pMins };
 
@@ -156,6 +159,7 @@
                     </div>`;
             });
 
+            // Jika tidak ada sholat berikutnya hari ini (setelah Isya), ambil Subuh besok
             if (!next) {
                 const [h, m] = t.Fajr.split(':').map(Number);
                 next = { ...prayers[0], time: t.Fajr, mins: h * 60 + 1440 };
@@ -191,6 +195,7 @@
             });
         };
 
+        // Muat default Kediri
         fetchPrayer('Kediri');
     </script>
 </body>

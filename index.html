@@ -30,6 +30,11 @@
 <body class="p-4 flex items-center justify-center">
 
     <div class="max-w-md w-full space-y-4">
+        <div class="flex justify-between items-center px-3 py-1 opacity-80">
+            <span class="text-xs font-medium tracking-wide uppercase" id="gregorianDisplay">Wednesday, 18 February 2026</span>
+            <span class="text-lg">🕋</span>
+        </div>
+
         <div class="flex justify-between items-end px-2">
             <div>
                 <h1 class="text-2xl font-bold tracking-tight" id="cityNameDisplay">Memuat...</h1>
@@ -112,6 +117,9 @@
             // Header Info
             document.getElementById('cityNameDisplay').innerText = state.city;
             document.getElementById('hijriDisplay').innerText = `${d.date.hijri.day} ${d.date.hijri.month.en} ${d.date.hijri.year} H`;
+            
+            // Tambahan: Update Gregorian Date
+            document.getElementById('gregorianDisplay').innerText = `${d.date.gregorian.weekday.en}, ${d.date.gregorian.day} ${d.date.gregorian.month.en} ${d.date.gregorian.year}`;
             
             // Imsak & Iftar (Maghrib)
             document.getElementById('imsakTime').innerText = t.Imsak;

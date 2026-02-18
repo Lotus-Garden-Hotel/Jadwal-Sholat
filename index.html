@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Jadwal Salat · Kemenag RI (Akurat)</title>
+    <style>
+        /* CSS tetap sama dengan sebelumnya */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .card {
+            max-width: 420px;
+            width: 100%;
+            background: white;
+            border-radius: 28px 28px 20px 20px;
+            box-shadow: 0 20px 35px -8px rgba(0, 20, 30, 0.2);
+            overflow: hidden;
+            border: 1px solid rgba(0, 70, 100, 0.08);
+        }
+
+        .header {
+            background: linear-gradient(145deg, #0b4e5c, #0a3b44);
+            color: white;
+            padding: 20px 16px 16px;
+        }
+
+        .header h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .header .subhead {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .search-box {
+            display: flex;
+            margin-top: 16px;
+            gap: 8px;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 40px;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            color: white;
+            outline: none;
+            backdrop-filter: blur(4px);
+            min-width: 0;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+            font-size: 0.9rem;
+        }
+
+        .search-box button {
+            background: white;
+            border: none;
+            border-radius: 40px;
+            padding: 0 18px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #0b4e5c;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        .search-box button:hover {
+            background: #e6f0f2;
+        }
+
+        .date-greg {
+            background: #f9fafb;
+            padding: 12px 16px;
+            border-bottom: 1px solid #dee7e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #1a3f4a;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .date-hijri {
+            background: #eaf1f3;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #11505f;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #b6d2d9;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .imsak-wrap {
+            background: #fff9e7;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 2px solid #fddeb6;
+            color: #2f4b3c;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .imsak-wrap span:first-child {
+            color: #a5530e;
+            font-weight: 500;
+            font-size: 0.95rem;
+            background: #ffebc8;
+            padding: 4px 14px;
+            border-radius: 40px;
+            white-space: nowrap;
+        }
+
+        .imsak-wrap span:last-child {
+            background: #1e6b5e;
+            color: white;
+            padding: 5px 18px;
+            border-radius: 40px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0,40,30,0.1);
+            white-space: nowrap;
+        }
+
+        .prayer-container {
+            padding: 6px 0 16px 0;
+            background: white;
+        }
+
+        .prayer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #edf3f5;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #11333b;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .prayer-name {
+            font-size: 1.2rem;
+            font-weight: 550;
+            width: 85px;
+            flex-shrink: 0;
+        }
+
+        .prayer-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            color: #003f4d;
+            flex-shrink: 0;
+        }
+
+        .prayer-status {
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #f2f8fa;
+            padding: 5px 12px;
+            border-radius: 40px;
+            color: #1d6170;
+            min-width: 85px;
+            text-align: center;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .prayer-status.now {
+            background: #1e7a68;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0,80,70,0.2);
+        }
+
+        .prayer-status.next {
+            background: #fdefd4;
+            color: #b45100;
+        }
+
+        .footer-note {
+            background: #f0f9fc;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #3e6a73;
+            border-top: 1px solid #cde2e7;
+            letter-spacing: 0.3px;
+            font-weight: 500;
+        }
+
+        .loading-indicator {
+            text-align: center;
+            padding: 40px 16px;
+            color: #3f7a84;
+            font-size: 1rem;
+        }
+
+        .error-message {
+            background: #ffd9ce;
+            color: #ac3700;
+            padding: 14px;
+            margin: 16px;
+            border-radius: 24px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .info-note {
+            background: #e1f5fe;
+            color: #035c7c;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            text-align: center;
+            border-bottom: 1px solid #b3e5fc;
+        }
+
+        @media (max-width: 360px) {
+            .header h2 {
+                font-size: 1.4rem;
+            }
+            .search-box input {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            .search-box button {
+                padding: 0 12px;
+                font-size: 0.85rem;
+            }
+            .prayer-name {
+                font-size: 1rem;
+                width: 70px;
+            }
+            .prayer-time {
+                font-size: 1.1rem;
+            }
+            .prayer-status {
+                font-size: 0.75rem;
+                min-width: 70px;
+                padding: 4px 6px;
+            }
+            .imsak-wrap {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .imsak-wrap span:last-child {
+                align-self: flex-end;
+            }
+            .date-greg, .date-hijri {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 280px) {
+            .prayer-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .prayer-status {
+                align-self: flex-start;
+            }
+            .imsak-wrap span:first-child, .imsak-wrap span:last-child {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="appCard">
+        <div class="header">
+            <h2 id="cityNameDisplay">Waktu Salat di Kediri</h2>
+            <div class="subhead">
+                <span>Indonesia</span>
+                <span id="liveTimeLabel">—</span>
+            </div>
+            <div class="search-box">
+                <input type="text" id="cityInput" placeholder="Ketik lokasi (contoh: Kediri)" value="Kediri">
+                <button id="searchBtn">Cari</button>
+            </div>
+        </div>
+
+        <!-- Info tuning -->
+        <div class="info-note">
+            ⏰ +3 menit (ihtiyat Kemenag) untuk Maghrib, Sunset, Isya
+        </div>
+
+        <!-- akan diisi javascript -->
+        <div id="mainContent">
+            <div class="loading-indicator">Memuat jadwal dari Kemenag RI ...</div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // elemen utama
+            const mainContent = document.getElementById('mainContent');
+            const cityNameDisplay = document.getElementById('cityNameDisplay');
+            const cityInput = document.getElementById('cityInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const liveTimeLabel = document.getElementById('liveTimeLabel');
+
+            // state
+            let currentCity = 'Kediri';
+            let prayerDataCache = null;
+            let updateInterval = null;
+
+            // konversi ke format 12 jam
+            function format12Hour(timeStr) {
+                if (!timeStr) return '';
+                let [hour, minute] = timeStr.split(':').map(Number);
+                const ampm = hour >= 12 ? 'pm' : 'am';
+                hour = hour % 12;
+                hour = hour ? hour : 12;
+                return `${hour}:${minute.toString().padStart(2, '0')}${ampm}`;
+            }
+
+            // mendapatkan menit dari string "HH:MM"
+            function getMinutesFromTime(timeStr) {
+                let [h, m] = timeStr.split(':').map(Number);
+                return h * 60 + m;
+            }
+
+            // update waktu live tiap detik
+            function updateLiveClock() {
+                const now = new Date();
+                liveTimeLabel.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+            setInterval(updateLiveClock, 1000);
+            updateLiveClock();
+
+            // render tampilan utama berdasarkan data cache dan waktu sekarang
+            function renderDisplay() {
+                if (!prayerDataCache) return;
+
+                const data = prayerDataCache;
+                const timings = data.timings;
+                const dateInfo = data.date;
+                
+                // ---- siapkan array sholat ----
+                const prayers = [
+                    { name: 'Subuh', time: timings.Fajr },
+                    { name: 'Zuhur', time: timings.Dhuhr },
+                    { name: 'Ashar', time: timings.Asr },
+                    { name: 'Maghrib', time: timings.Maghrib },
+                    { name: 'Isya', time: timings.Isha }
+                ];
+
+                // waktu sekarang dalam menit (lokal browser)
+                const now = new Date();
+                let currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+                const prayerMinutes = prayers.map(p => getMinutesFromTime(p.time));
+
+                // tentukan sholat saat ini
+                let currentIndex = -1;
+                let nextIndex = -1;
+
+                for (let i = prayerMinutes.length - 1; i >= 0; i--) {
+                    if (prayerMinutes[i] <= currentMinutes) {
+                        currentIndex = i;
+                        break;
+                    }
+                }
+
+                for (let i = 0; i < prayerMinutes.length; i++) {
+                    if (prayerMinutes[i] > currentMinutes) {
+                        nextIndex = i;
+                        break;
+                    }
+                }
+
+                // jika tidak ada next (sudah lewat Isya), next adalah Subuh besok
+                let nextPrayer = null;
+                let diffMinutes = null;
+                if (nextIndex === -1) {
+                    nextIndex = 0;
+                    const subuhBesok = prayerMinutes[0] + 1440;
+                    diffMinutes = subuhBesok - currentMinutes;
+                    nextPrayer = prayers[0];
+                } else {
+                    nextPrayer = prayers[nextIndex];
+                    diffMinutes = prayerMinutes[nextIndex] - currentMinutes;
+                }
+
+                const currentPrayer = currentIndex !== -1 ? prayers[currentIndex] : null;
+
+                // ---- build HTML ----
+                let html = '';
+
+                // tanggal Masehi dan Hijriah
+                const gregorian = dateInfo.gregorian;
+                const hijri = dateInfo.hijri;
+                const weekday = gregorian.weekday.en;
+                const day = gregorian.day;
+                const month = gregorian.month.en;
+                const year = gregorian.year;
+                const formattedGreg = `${weekday}, ${day} ${month} ${year}`;
+
+                let hijriMonth = hijri.month.en;
+                if (hijriMonth.toLowerCase() === 'ramadan') hijriMonth = 'Ramadhan';
+                const formattedHijri = `${hijri.day} ${hijriMonth} ${hijri.year}`;
+
+                html += `<div class="date-greg"><span>${formattedGreg}</span><span>🕋</span></div>`;
+                html += `<div class="date-hijri"><span>${formattedHijri}</span><span>${hijri.year} H</span></div>`;
+
+                // Imsak & Iftar
+                const imsakTime = format12Hour(timings.Imsak);
+                const iftarTime = format12Hour(timings.Maghrib);
+                html += `<div class="imsak-wrap"><span>🌙 Imsak ${imsakTime}</span><span>☀️ Iftar ${iftarTime}</span></div>`;
+
+                // daftar sholat
+                html += `<div class="prayer-container">`;
+                prayers.forEach((prayer, idx) => {
+                    const time12 = format12Hour(prayer.time);
+                    let statusText = '';
+                    let statusClass = '';
+
+                    if (currentPrayer && currentPrayer.name === prayer.name) {
+                        statusText = 'Sekarang';
+                        statusClass = 'now';
+                    } else if (nextPrayer && nextPrayer.name === prayer.name) {
+                        const hours = Math.floor(diffMinutes / 60);
+                        const mins = diffMinutes % 60;
+                        let countdownText = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                        statusText = `di ${countdownText}`;
+                        statusClass = 'next';
+                    } else {
+                        statusText = '—';
+                    }
+
+                    html += `
+                        <div class="prayer-item">
+                            <span class="prayer-name">${prayer.name}</span>
+                            <span class="prayer-time">${time12}</span>
+                            <span class="prayer-status ${statusClass}">${statusText}</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+
+                // footer sumber
+                html += `<div class="footer-note">🕌 SIHAT / KEMENAG (Kementerian Agama RI) + tuning ihtiyat</div>`;
+
+                mainContent.innerHTML = html;
+            }
+
+            // fetch dari API Aladhan method 11 dengan tuning parameter
+            async function fetchPrayerTimes(city) {
+                // Tuning parameter untuk menyesuaikan dengan ihtiyat Kemenag
+                // Urutan: Imsak,Fajr,Sunrise,Dhuhr,Asr,Maghrib,Sunset,Isha,Midnight
+                // +3 menit untuk Maghrib, Sunset, Isha (berdasarkan data Kediri)
+                const tuneAdjust = "0,0,0,0,0,3,3,3,0";
+                
+                const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=Indonesia&method=11&tune=${tuneAdjust}`;
+
+                try {
+                    mainContent.innerHTML = `<div class="loading-indicator">Mengambil data dari Bimas Islam ...</div>`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Respon jaringan gagal');
+                    const result = await response.json();
+                    if (result.code !== 200) throw new Error('Data tidak ditemukan untuk kota ini');
+                    
+                    prayerDataCache = result.data;
+                    cityNameDisplay.innerText = `Waktu Salat di ${city}`;
+                    renderDisplay();
+
+                    if (updateInterval) clearInterval(updateInterval);
+                    updateInterval = setInterval(() => {
+                        if (prayerDataCache) renderDisplay();
+                    }, 1000);
+
+                } catch (error) {
+                    mainContent.innerHTML = `<div class="error-message">⚠️ Gagal memuat: ${error.message}. Periksa nama kota.</div>`;
+                    prayerDataCache = null;
+                }
+            }
+
+            // event cari kota
+            searchBtn.addEventListener('click', () => {
+                const newCity = cityInput.value.trim();
+                if (newCity === '') return;
+                currentCity = newCity;
+                fetchPrayerTimes(newCity);
+            });
+
+            cityInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchBtn.click();
+                }
+            });
+
+            // inisialisasi dengan Kediri
+            fetchPrayerTimes('Kediri');
+
+            window.addEventListener('beforeload', () => {
+                if (updateInterval) clearInterval(updateInterval);
+            });
+        })();
+    </script>
+</body>
+</html>

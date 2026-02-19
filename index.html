@@ -37,10 +37,10 @@
 
         <div class="flex justify-between items-end px-2">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight" id="cityNameDisplay">Kediri</h1>
+                <h1 class="text-2xl font-bold tracking-tight" id="cityNameDisplay">Memuat...</h1>
                 <p class="text-teal-400 text-sm font-medium" id="hijriDisplay">1 Ramadhan 1447 H</p>
             </div>
-            <button id="locateBtn" class="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-2xl transition-all shadow-lg">📍</button>
+            <button id="locateBtn" class="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-2xl transition-all shadow-lg" title="Gunakan Lokasi Saya">📍</button>
         </div>
 
         <div class="relative group">
@@ -86,33 +86,43 @@
         <div class="grid gap-2" id="prayerList"></div>
 
         <p class="text-[10px] text-center text-slate-500 uppercase tracking-[0.2em] pt-2">
-            Metode Kemenag RI • Semua waktu +3 menit • © 2026
+            Metode Kemenag RI • Semua waktu +3 menit (ihtiyat) • © 2026
         </p>
     </div>
 
     <script>
-        // Paksa adjustment -1 hari agar sinkron dengan Indonesia
         const CONFIG = { tune: "3,3,0,3,3,3,3,3,0", method: 11, adj: -1 };
         let state = { city: 'Kediri', data: null };
 
+        // 1. Fungsi Fetch berdasarkan Nama Kota
         async function fetchPrayer(city) {
             try {
-                // Perhatikan penambahan &adjustment=${CONFIG.adj} di akhir URL
                 const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=Indonesia&method=${CONFIG.method}&tune=${CONFIG.tune}&adjustment=${CONFIG.adj}`;
                 const res = await fetch(url);
                 const json = await res.json();
                 state.data = json.data;
                 state.city = city;
                 render();
-            } catch (err) { alert("Gagal memuat data"); }
+            } catch (err) { alert("Gagal memuat data kota"); }
+        }
+
+        // 2. Fungsi Fetch berdasarkan Koordinat (Tombol Map)
+        async function fetchByCoords(lat, lon) {
+            try {
+                const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=${CONFIG.method}&tune=${CONFIG.tune}&adjustment=${CONFIG.adj}`;
+                const res = await fetch(url);
+                const json = await res.json();
+                state.data = json.data;
+                state.city = "Lokasi Saya";
+                render();
+            } catch (err) { alert("Gagal memuat koordinat"); }
         }
 
         function render() {
             const d = state.data;
             const t = d.timings;
             
-            // --- LOGIKA FIX 1 RAMADHAN ---
-            // Jika hari ini 19 Feb 2026, kita paksa tampilan jadi 1 Ramadhan
+            // Override Tanggal Hijriah agar sinkron 1 Ramadhan
             if(d.date.gregorian.date === "19-02-2026") {
                 document.getElementById('hijriDisplay').innerText = `1 Ramadhan ${d.date.hijri.year} H`;
             } else {
@@ -161,7 +171,20 @@
             document.getElementById('countdownTimer').innerText = `${Math.floor(diff/60)} jam ${diff%60} menit lagi`;
         }
 
+        // Event Listeners
         document.getElementById('searchBtn').onclick = () => fetchPrayer(document.getElementById('cityInput').value);
+        
+        document.getElementById('locateBtn').onclick = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => fetchByCoords(pos.coords.latitude, pos.coords.longitude),
+                    (err) => alert("Izin lokasi ditolak atau tidak tersedia")
+                );
+            } else {
+                alert("Browser tidak mendukung geolokasi");
+            }
+        };
+
         fetchPrayer('Kediri');
     </script>
 </body>
